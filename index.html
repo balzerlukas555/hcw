@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webové hry | balzerlukas555</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --accent-green: #10b981;
+            --accent-gold: #fbbf24;
+            --text-main: #f1f5f9;
+            --card-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--accent-green);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .intro-text {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        /* --- STYL PRO ROZBALOVACÍ SEKCE --- */
+        details {
+            background: var(--card-bg);
+            margin-bottom: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.2s;
+        }
+
+        details:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-green);
+        }
+
+        summary {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            outline: none;
+        }
+
+        summary::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: var(--accent-green);
+            transition: transform 0.3s;
+        }
+
+        details[open] summary::after {
+            transform: rotate(180deg);
+        }
+
+        .content {
+            padding: 0 20px 20px 20px;
+            line-height: 1.6;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .highlight {
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        .btn-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: var(--accent-green);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            text-align: center;
+            width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Webové hry</h1>
+        <p class="intro-text">
+            Vítejte v mém herním koutku! Najdete zde propojené projekty, které kombinují strategii, štěstí a soutěživost. 
+            Všechny mé hry jsou navrženy pro komunitu a vzájemně na sebe navazují.
+        </p>
+    </header>
+
+    <div class="container">
+        
+        <details>
+            <summary>Tipovačka</summary>
+            <div class="content">
+                <p>
+                    <strong>Tipovačka</strong> je vlajkový projekt naší komunity. Je to místo, kde můžete měřit své síly v odhadech výsledků sportovních zápasů a jiných událostí. 
+                </p>
+                <ul>
+                    <li>Sázejte na reálné výsledky bez rizika ztráty reálných peněz.</li>
+                    <li>Hlavní měnou jsou <span class="highlight">Tip-Coiny (TC)</span>, které určují vaši pozici v žebříčku.</li>
+                    <li>Své konto TC můžete navyšovat buď správnými tipy, nebo převodem z ostatních her v našem ekosystému.</li>
+                </ul>
+                <a href="https://balzerlukas555.github.io/tipovacka" class="btn-link">Přejít k Tipovačce</a>
+            </div>
+        </details>
+
+        <details>
+            <summary>Mezi Kozy</summary>
+            <div class="content">
+                <p>
+                    Klasická karetní hra v moderním webovém kabátě. Hra, která prověří vaše nervy a schopnost odhadnout riziko.
+                </p>
+                <p><strong>Jak to funguje?</strong></p>
+                <ul>
+                    <li>Dostanete dvě karty a vaším úkolem je vsadit na to, že hodnota třetí karty padne přesně mezi ně.</li>
+                    <li>Pozor na <span class="highlight">"KOZU"</span>! Pokud trefíte hranu (stejnou kartu, jako už máte), platíte dvojnásobek sázky do banku.</li>
+                    <li>ESA jsou královská – pokud dostanete dvě esa na start, berete okamžitě celý bank.</li>
+                </ul>
+                <p><strong>Propojení s Tipovačkou:</strong></p>
+                <p>
+                    Vyhrané Coiny se ukládají do vašeho trezoru. Tyto Coiny můžete v kurzu <strong>10:1</strong> převádět přímo na <span class="highlight">Tip-Coiny (TC)</span> do hlavní Tipovačky a zajistit si tak náskok před ostatními.
+                </p>
+                <a href="https://balzerlukas555.github.io/mezi-kozy" class="btn-link">Hrát Mezi Kozy</a>
+            </div>
+        </details>
+
+    </div>
+
+    <footer>
+        &copy; 2026 Lukáš Balzer. Všechna práva vyhrazena. 
+        <br>
+        Hry jsou určeny pouze pro zábavní účely a nepracují s reálnou měnou.
+    </footer>
+
+</body>
+</html>
