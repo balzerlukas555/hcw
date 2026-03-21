@@ -165,7 +165,7 @@
     };
 
     let gameState = { players: [], pot: 0, active: false, lastBet: 0 };
-    const botNames = ["PUKATOR", "HOKEJKA88", "LAPAČ"];
+    const botNames = ["PEPA", "MARTIN", "KAREL"];
 
     function initGame() {
         const nick = document.getElementById('nickInput').value || "Host";
@@ -190,8 +190,9 @@
         document.getElementById('log').innerHTML = "Kolo začalo.";
         document.getElementById('userBudget').innerText = gameState.players[0].budget;
 
-        gameState.players.forEach(p => {
-            p.card = cardKeys[Math.floor(Math.random()*cardKeys.length)];
+        const shuffled = [...cardKeys].sort(() => Math.random() - 0.5);
+        gameState.players.forEach((p, index) => {
+            p.card = shuffled[index];
             p.folded = false;
         });
 
@@ -219,7 +220,10 @@
         let bet = 0;
 
         if(type === 'fold') { 
+            if(me.budget < 20) return alert("Nemáš ani 20 TC na Pas!");
+            me.budget -= 20;
             me.folded = true; 
+            addLog("Položil jsi to (-20 TC).");
             evaluate(); 
             return; 
         }
@@ -240,7 +244,7 @@
         let activeBots = 0;
         gameState.players.forEach(p => {
             if(p.isBot) {
-                p.budget -= bet; // Simulace, že boti vždy dorovnají
+                p.budget -= bet; 
                 activeBots++;
             }
         });
@@ -257,7 +261,7 @@
         let me = gameState.players[0];
         
         if(me.folded) {
-            addLog("Položil jsi to.");
+            addLog("Prohrál jsi (vzdal ses).");
         } else {
             let myVal = getVal(me.card);
             let botVals = gameState.players.filter(p => p.isBot).map(p => getVal(p.card));
