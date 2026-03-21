@@ -1,1 +1,326 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCW</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #0f172a; 
+            color: white; 
+            text-align: center; 
+            margin: 0; 
+            padding: 10px; 
+        }
 
+        /* --- SETUP OBRAZOVKA --- */
+        #setupScreen { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 90vh; 
+        }
+
+        .auth-box { 
+            background: #1e293b; 
+            padding: 25px; 
+            border-radius: 15px; 
+            width: 90%; 
+            max-width: 350px; 
+            border: 1px solid #3b82f6; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
+        }
+
+        input, select { 
+            padding: 10px; 
+            border-radius: 6px; 
+            background: #0f172a; 
+            color: white; 
+            border: 1px solid #334155; 
+            margin: 10px 0; 
+            width: 100%; 
+            box-sizing: border-box; 
+        }
+
+        button { 
+            padding: 12px 15px; 
+            border: none; 
+            border-radius: 8px; 
+            background: #3b82f6; 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:disabled { background: #334155; cursor: not-allowed; }
+        .btn-danger { background: #991b1b; }
+        .btn-success { background: #059669; }
+
+        /* --- HERNÍ PLOCHA --- */
+        #gameScreen { display: none; max-width: 600px; margin: 0 auto; }
+        
+        .pot-info { 
+            background: #1e294b; 
+            border: 2px solid #3b82f6; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin: 10px 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #6ee7b7;
+        }
+
+        .player-area { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 10px; 
+            margin-top: 20px; 
+        }
+
+        .card-slot { 
+            background: #1e293b; 
+            border: 1px solid #334155; 
+            padding: 10px; 
+            border-radius: 10px; 
+            width: 120px; 
+            min-height: 160px;
+        }
+
+        .card-slot.active { border-color: #3b82f6; background: #1e294b; }
+        .card-slot.folded { opacity: 0.5; }
+
+        .card-val { 
+            font-size: 32px; 
+            font-weight: bold; 
+            margin: 20px 0; 
+            height: 40px;
+        }
+
+        .status-text { font-size: 12px; color: #94a3b8; height: 15px; }
+
+        .controls { 
+            margin-top: 30px; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+        }
+
+        .action-log {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 13px;
+            text-align: left;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="setupScreen">
+        <div class="auth-box">
+            <h2 style="color: #3b82f6; margin-top: 0;">HCW Setup</h2>
+            <input type="text" id="nickInput" placeholder="Zadej svůj nick">
+            <input type="number" id="budgetInput" value="1000" placeholder="Tvůj budget">
+            
+            <label style="font-size: 13px; color: #94a3b8;">Počet soupeřů:</label>
+            <select id="botCount">
+                <option value="1">1 Soupeř</option>
+                <option value="2">2 Soupeři</option>
+                <option value="3">3 Soupeři</option>
+            </select>
+
+            <button onclick="initGame()" class="btn-success">ZAČÍT HRU</button>
+            <button onclick="location.href='index.html'" style="background:transparent; color:#94a3b8; font-size:12px;">Zpět na hlavní menu</button>
+        </div>
+    </div>
+
+    <div id="gameScreen">
+        <h2 id="gameTitle">Higher Card Wins</h2>
+        <div class="pot-info">Bank: <span id="potAmount">0</span> TC</div>
+        
+        <div id="playerArea" class="player-area"></div>
+
+        <div class="controls" id="gameControls">
+            <button onclick="playerAction('bet')" id="btnBet">Vsadit (100)</button>
+            <button onclick="playerAction('allin')" class="btn-success">All-In</button>
+            <button onclick="playerAction('fold')" class="btn-danger">Pas</button>
+            <button onclick="nextRound()" id="btnNext" style="display:none;">Nové kolo</button>
+        </div>
+
+        <div id="log" class="action-log"></div>
+        <button onclick="location.reload()" class="btn-danger" style="margin-top: 20px; width: auto; padding: 5px 15px; font-size: 11px;">Ukončit hru</button>
+    </div>
+
+    <script>
+        let gameState = {
+            players: [],
+            pot: 0,
+            roundActive: false,
+            currentBet: 100
+        };
+
+        const cardValues = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+        const botNames = ["Pukator", "Hokejka88", "Lapač", "Betman"];
+
+        function initGame() {
+            const nick = document.getElementById('nickInput').value || "Hráč";
+            const budget = parseInt(document.getElementById('budgetInput').value) || 1000;
+            const bots = parseInt(document.getElementById('botCount').value);
+
+            gameState.players = [];
+            // Přidání hráče
+            gameState.players.push({ id: 0, name: nick, budget: budget, card: 0, folded: false, isBot: false });
+            
+            // Přidání botů
+            for(let i=1; i <= bots; i++) {
+                gameState.players.push({ id: i, name: botNames[i-1], budget: budget, card: 0, folded: false, isBot: true });
+            }
+
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            
+            startNewRound();
+        }
+
+        function startNewRound() {
+            gameState.pot = 0;
+            gameState.roundActive = true;
+            gameState.currentBet = 100;
+            
+            document.getElementById('btnNext').style.display = 'none';
+            document.getElementById('btnBet').style.display = 'block';
+            document.getElementById('btnBet').innerText = `Vsadit (${gameState.currentBet})`;
+            document.getElementById('log').innerHTML = "Začíná nové kolo. Rozdávám karty...";
+
+            gameState.players.forEach(p => {
+                p.card = Math.floor(Math.random() * cardValues.length);
+                p.folded = false;
+                if(p.budget <= 0) p.folded = true; 
+            });
+
+            renderPlayers(false);
+            updateUI();
+        }
+
+        function renderPlayers(showAll) {
+            const area = document.getElementById('playerArea');
+            area.innerHTML = "";
+
+            gameState.players.forEach(p => {
+                const cardText = (p.isBot && !showAll) ? "?" : cardValues[p.card];
+                const status = p.folded ? "PAS" : (p.budget <= 0 ? "ALL-IN" : "");
+                
+                area.innerHTML += `
+                    <div class="card-slot ${p.id === 0 ? 'active' : ''} ${p.folded ? 'folded' : ''}">
+                        <div style="font-size: 12px; font-weight: bold;">${p.name}</div>
+                        <div class="card-val">${cardText}</div>
+                        <div style="color: #6ee7b7; font-weight: bold;">${p.budget} TC</div>
+                        <div class="status-text">${status}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function playerAction(type) {
+            if(!gameState.roundActive) return;
+
+            let p = gameState.players[0];
+
+            if(type === 'bet') {
+                if(p.budget < gameState.currentBet) return alert("Nemáš dost TC!");
+                p.budget -= gameState.currentBet;
+                gameState.pot += gameState.currentBet;
+                addLog(`Vsadil jsi ${gameState.currentBet} TC.`);
+            } else if(type === 'allin') {
+                gameState.pot += p.budget;
+                addLog(`Dal jsi ALL-IN (${p.budget} TC)!`);
+                p.budget = 0;
+            } else if(type === 'fold') {
+                p.folded = true;
+                addLog("Položil jsi karty.");
+            }
+
+            processBots();
+        }
+
+        function processBots() {
+            gameState.players.forEach(p => {
+                if(p.isBot && !p.folded) {
+                    // Jednoduchá logika bota: pokud má kartu 7 a víc, vsadí. Pokud má A, dá možná all-in.
+                    if(p.card < 4 && Math.random() > 0.5) {
+                        p.folded = true;
+                        addLog(`${p.name} pasuje.`);
+                    } else if(p.card > 10 && Math.random() > 0.8 && p.budget > 0) {
+                        gameState.pot += p.budget;
+                        p.budget = 0;
+                        addLog(`${p.name} dává ALL-IN!`);
+                    } else {
+                        let bet = Math.min(p.budget, gameState.currentBet);
+                        p.budget -= bet;
+                        gameState.pot += bet;
+                        addLog(`${p.name} dorovnal sázku.`);
+                    }
+                }
+            });
+
+            evaluateRound();
+        }
+
+        function evaluateRound() {
+            gameState.roundActive = false;
+            renderPlayers(true);
+
+            let winners = [];
+            let maxVal = -1;
+
+            gameState.players.forEach(p => {
+                if(!p.folded) {
+                    if(p.card > maxVal) {
+                        maxVal = p.card;
+                        winners = [p];
+                    } else if(p.card === maxVal) {
+                        winners.push(p);
+                    }
+                }
+            });
+
+            if(winners.length > 0) {
+                let winPerPerson = Math.floor(gameState.pot / winners.length);
+                winners.forEach(w => w.budget += winPerPerson);
+                addLog(`Vítěz: ${winners.map(w => w.name).join(", ")} bere ${gameState.pot} TC!`);
+            } else {
+                addLog("Nikdo nevyhrál, všichni pasovali.");
+            }
+
+            updateUI();
+            document.getElementById('btnNext').style.display = 'block';
+            document.getElementById('btnBet').style.display = 'none';
+        }
+
+        function nextRound() {
+            if(gameState.players[0].budget <= 0) {
+                alert("Prohrál jsi všechny TC! Hra končí.");
+                location.reload();
+                return;
+            }
+            startNewRound();
+        }
+
+        function updateUI() {
+            document.getElementById('potAmount').innerText = gameState.pot;
+        }
+
+        function addLog(msg) {
+            const log = document.getElementById('log');
+            log.innerHTML = `<div>> ${msg}</div>` + log.innerHTML;
+        }
+    </script>
+</body>
+</html>
