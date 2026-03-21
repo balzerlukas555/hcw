@@ -8,83 +8,50 @@
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/15661/15661093.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/15661/15661093.png">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
     <style>
-        /* --- ZÁKLADNÍ STYL (MOBILNÍ FIRST) --- */
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: #0f172a; 
-            color: white; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #0b0f1a; 
+            color: #e2e8f0; 
             text-align: center; 
             margin: 0; 
             padding: 10px; 
-            overflow-x: hidden;
         }
 
-        .container { 
-            max-width: 500px; 
-            margin: 0 auto; 
-            padding-bottom: 50px;
-        }
+        .container { max-width: 500px; margin: 0 auto; }
 
-        /* --- LOGO --- */
-        .logo-img {
-            width: 80px;
-            height: 80px;
-            margin-top: 20px;
-            filter: drop-shadow(0 0 10px #3b82f6);
-        }
+        h1 { color: #3b82f6; text-transform: uppercase; letter-spacing: 2px; margin: 15px 0; }
 
-        h1 { 
-            color: #3b82f6; 
-            text-transform: uppercase; 
-            margin: 10px 0 20px 0; 
-            letter-spacing: 3px;
-            font-size: 28px;
-        }
-
-        /* --- BOXY A MODULY --- */
-        .auth-box, .game-box, .menu-box { 
-            background: #1e293b; 
+        /* --- HOSPODSKÝ STYL BOXŮ --- */
+        .auth-box, .menu-box, .game-area { 
+            background: #161e2d; 
             padding: 20px; 
-            border-radius: 20px; 
-            border: 1px solid #3b82f6; 
-            margin-top: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            border-radius: 12px; 
+            border: 1px solid #2d3748; 
+            margin-top: 15px;
         }
 
-        /* --- PENĚŽENKA --- */
         .wallet { 
             display: flex; 
             justify-content: space-around; 
-            background: #1e294b; 
-            padding: 15px; 
-            border-radius: 15px; 
-            margin: 15px 0; 
-            border: 1px solid #334155; 
+            background: #1e293b; 
+            padding: 12px; 
+            border-radius: 10px; 
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3b82f6;
         }
 
-        .val { 
-            font-weight: bold; 
-            color: #6ee7b7; 
-            font-size: 20px; 
-            display: block;
-        }
+        .val { font-weight: bold; color: #6ee7b7; font-size: 18px; }
+        .label { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
 
-        .label { 
-            font-size: 11px; 
-            color: #94a3b8; 
-            text-transform: uppercase;
-        }
-
-        /* --- FORMULÁŘE A TLAČÍTKA --- */
         input { 
             width: 100%; 
-            padding: 14px; 
+            padding: 12px; 
             margin: 8px 0; 
-            border-radius: 10px; 
-            border: 1px solid #334155; 
+            border-radius: 8px; 
+            border: 1px solid #2d3748; 
             background: #0f172a; 
             color: white; 
             box-sizing: border-box; 
@@ -93,161 +60,112 @@
 
         button { 
             width: 100%; 
-            padding: 15px; 
+            padding: 14px; 
             border: none; 
-            border-radius: 12px; 
+            border-radius: 8px; 
             background: #3b82f6; 
             color: white; 
             font-weight: bold; 
             cursor: pointer; 
-            margin-top: 10px; 
-            font-size: 16px;
-            transition: transform 0.1s, background 0.2s;
-            -webkit-tap-highlight-color: transparent;
+            margin-top: 8px; 
+            font-size: 15px;
         }
 
-        button:active { transform: scale(0.96); }
-
-        .btn-alt { background: #475569; }
         .btn-success { background: #059669; }
         .btn-danger { background: #991b1b; }
-        .btn-guest { background: transparent; border: 1px solid #3b82f6; color: #3b82f6; }
+        .btn-alt { background: #334155; }
 
-        /* --- HERNÍ PLOCHA (GUEST STYLE) --- */
-        #gameArea { display: none; }
-        
-        .pot-info { 
-            background: #1e294b; 
-            border: 2px solid #fbbf24; 
-            padding: 15px; 
-            border-radius: 15px; 
-            margin: 20px 0;
-            font-size: 22px;
-            font-weight: bold;
-            color: #fbbf24;
+        /* --- KARTY --- */
+        .card-img {
+            width: 90px;
+            height: 130px;
+            border-radius: 6px;
+            border: 1px solid #4a5568;
+            background: #2d3748;
+            object-fit: cover;
         }
 
-        .player-area { 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            gap: 10px; 
-            margin-top: 20px; 
-        }
-
-        .card-slot { 
-            background: #1e293b; 
-            border: 1px solid #334155; 
-            padding: 10px; 
-            border-radius: 12px; 
-            width: 100px; 
-            min-height: 140px;
-        }
-
-        .card-slot.active { border-color: #3b82f6; background: #1e294b; }
-        .card-slot.folded { opacity: 0.4; }
-
-        .card-val { 
-            font-size: 28px; 
+        .player-slot { margin: 10px; display: inline-block; vertical-align: top; }
+        .pot-box { 
+            font-size: 22px; 
+            color: #fbbf24; 
             font-weight: bold; 
-            margin: 15px 0; 
-            height: 35px;
+            padding: 10px; 
+            border: 1px dashed #fbbf24; 
+            margin-bottom: 15px; 
         }
 
-        .controls { 
-            margin-top: 25px; 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-        }
-
-        .action-log {
-            background: rgba(0,0,0,0.4);
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 20px;
+        #log {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
             font-size: 13px;
             text-align: left;
-            max-height: 100px;
+            max-height: 80px;
             overflow-y: auto;
-            border: 1px solid #334155;
-            line-height: 1.4;
+            color: #cbd5e1;
         }
 
-        hr { border: 0; border-top: 1px solid #334155; margin: 20px 0; }
-
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
-
-    <img src="https://cdn-icons-png.flaticon.com/512/15661/15661093.png" class="logo-img" alt="HCW Logo">
     <h1>HCW</h1>
 
     <div id="authSection" class="auth-box">
         <input type="email" id="email" placeholder="E-mail">
         <input type="password" id="pass" placeholder="Heslo">
         <button onclick="window.login()" class="btn-success">PŘIHLÁSIT SE</button>
-        <button onclick="location.href='guest.html'" class="btn-guest">HRÁT JAKO HOST</button>
+        <button onclick="location.href='guest.html'" class="btn-alt">HRÁT JAKO HOST</button>
     </div>
 
-    <div id="mainMenu" style="display:none;">
-        
+    <div id="mainWrapper" class="hidden">
         <div class="wallet">
-            <div>
-                <span class="label">Moje TC</span>
-                <span id="txtTC" class="val">0</span>
-            </div>
-            <div>
-                <span class="label">Moje Coiny</span>
-                <span id="txtCoins" class="val">0</span>
-            </div>
+            <div><span class="label">Moje TC</span><span id="txtTC" class="val">0</span></div>
+            <div><span class="label">Moje Coiny</span><span id="txtCoins" class="val">0</span></div>
         </div>
 
-        <div class="menu-box" style="margin-top: 10px;">
-            <button onclick="window.showGame()" class="btn-success" style="font-size: 20px; padding: 20px;">HRÁT HCW</button>
-            
-            <hr>
-            
-            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">SMĚNÁRNA (KURZ 20:1)</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button onclick="window.exchange('toCoins')" class="btn-alt" style="font-size: 12px;">100 TC &rarr; 2000 C</button>
-                <button onclick="window.exchange('toTC')" class="btn-alt" style="font-size: 12px;">2000 C &rarr; 100 TC</button>
+        <div id="mainMenu" class="menu-box">
+            <button onclick="window.showGame()" class="btn-success" style="font-size: 18px;">VSTOUPIT DO HRY</button>
+            <hr style="border: 0; border-top: 1px solid #2d3748; margin: 15px 0;">
+            <div class="label" style="margin-bottom: 5px;">Směnárna (1 TC = 20 C)</div>
+            <input type="number" id="exAmount" placeholder="Množství TC k převodu">
+            <div style="display: flex; gap: 5px;">
+                <button onclick="window.exchange('toCoins')" class="btn-alt">TC na Coiny</button>
+                <button onclick="window.exchange('toTC')" class="btn-alt">Coiny na TC</button>
             </div>
-
-            <button onclick="window.logout()" class="btn-danger" style="margin-top: 30px; font-size: 12px; padding: 10px;">ODHLÁSIT SE</button>
+            <button onclick="window.logout()" class="btn-danger" style="margin-top: 20px; font-size: 12px;">ODHLÁSIT SE</button>
         </div>
-
     </div>
 
-    <div id="gameArea">
+    <div id="gameArea" class="game-area hidden">
+        <div class="pot-box">Bank: <span id="potAmount">0</span> C</div>
         
-        <div class="pot-info">Bank: <span id="potAmount">0</span> C</div>
-        
-        <div id="playerArea" class="player-area"></div>
+        <div id="table" style="display: flex; justify-content: center; flex-wrap: wrap;"></div>
 
-        <div class="controls" id="gameControls">
-            <button onclick="window.gameAction('bet')" id="btnBet" class="btn-success">Vsadit (100 C)</button>
-            <button onclick="window.gameAction('fold')" class="btn-danger">Pas</button>
-            
-            <button onclick="window.nextRound()" id="btnNext" style="display:none; grid-column: span 2;" class="btn-success">DALŠÍ KOLO</button>
-            <button onclick="window.closeGame()" id="btnBack" style="grid-column: span 2;" class="btn-alt">ZPĚT DO MENU</button>
+        <div id="gameControls">
+            <input type="number" id="betInput" placeholder="Sázka v Coinech">
+            <div style="display: flex; gap: 5px;">
+                <button onclick="window.gameAction('bet')" class="btn-success">Vsadit</button>
+                <button onclick="window.gameAction('allin')" class="btn-success">All-In</button>
+                <button onclick="window.gameAction('fold')" class="btn-danger">Pas</button>
+            </div>
+            <button id="btnNext" onclick="window.nextRound()" class="btn-alt hidden">DALŠÍ KOLO</button>
+            <button onclick="window.closeGame()" class="btn-alt" style="margin-top: 15px;">ZPĚT DO MENU</button>
         </div>
 
-        <div id="log" class="action-log"></div>
-
+        <div id="log"></div>
     </div>
-
 </div>
 
 <script type="module">
-    // --- IMPORT FIREBASE ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // --- CONFIG ---
     const firebaseConfig = {
         apiKey: "AIzaSyC2xPE4YnIanTiRgrwsoXgoclTyOq0BraE",
         authDomain: "tipovacka-fce0e.firebaseapp.com",
@@ -260,175 +178,143 @@
     const db = getDatabase(app);
 
     let currentUser = null;
-    let userData = { balance: 0, coins: 0, name: "" };
-    
-    // --- HERNÍ PROMĚNNÉ ---
-    let gameState = {
-        active: false,
-        pot: 0,
-        players: []
-    };
-    const cardValues = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-    const botNames = ["Pukator", "Hokejka88", "Lapač"];
+    let userData = { balance: 0, coins: 0 };
+    let gameState = { active: false, pot: 0, players: [], lastBet: 0 };
 
-    // --- AUTH LOGIKA ---
+    const IMAGE_URLS = {
+        "7_K": "https://hra-lora.cz/assets/cardsmini/7_d.jpg", "8_K": "https://hra-lora.cz/assets/cardsmini/8_d.jpg", "9_K": "https://hra-lora.cz/assets/cardsmini/9_d.jpg", "10_K": "https://hra-lora.cz/assets/cardsmini/t_d.jpg", "J_K": "https://hra-lora.cz/assets/cardsmini/j_d.jpg", "Q_K": "https://hra-lora.cz/assets/cardsmini/q_d.jpg", "K_K": "https://hra-lora.cz/assets/cardsmini/k_d.jpg", "A_K": "https://hra-lora.cz/assets/cardsmini/a_d.jpg",
+        "7_Z": "https://hra-lora.cz/assets/cardsmini/7_s.jpg", "8_Z": "https://hra-lora.cz/assets/cardsmini/8_s.jpg", "9_Z": "https://hra-lora.cz/assets/cardsmini/9_s.jpg", "10_Z": "https://hra-lora.cz/assets/cardsmini/t_s.jpg", "J_Z": "https://hra-lora.cz/assets/cardsmini/j_s.jpg", "Q_Z": "https://hra-lora.cz/assets/cardsmini/q_s.jpg", "K_Z": "https://hra-lora.cz/assets/cardsmini/k_s.jpg", "A_Z": "https://hra-lora.cz/assets/cardsmini/a_s.jpg",
+        "7_C": "https://hra-lora.cz/assets/cardsmini/7_h.jpg", "8_C": "https://hra-lora.cz/assets/cardsmini/8_h.jpg", "9_C": "https://hra-lora.cz/assets/cardsmini/9_h.jpg", "10_C": "https://hra-lora.cz/assets/cardsmini/t_h.jpg", "J_C": "https://hra-lora.cz/assets/cardsmini/j_h.jpg", "Q_C": "https://hra-lora.cz/assets/cardsmini/q_h.jpg", "K_C": "https://hra-lora.cz/assets/cardsmini/k_h.jpg", "A_C": "https://hra-lora.cz/assets/cardsmini/a_h.jpg",
+        "7_ZL": "https://hra-lora.cz/assets/cardsmini/7_c.jpg", "8_ZL": "https://hra-lora.cz/assets/cardsmini/8_c.jpg", "9_ZL": "https://hra-lora.cz/assets/cardsmini/9_c.jpg", "10_ZL": "https://hra-lora.cz/assets/cardsmini/t_c.jpg", "J_ZL": "https://hra-lora.cz/assets/cardsmini/j_c.jpg", "Q_ZL": "https://hra-lora.cz/assets/cardsmini/q_c.jpg", "K_ZL": "https://hra-lora.cz/assets/cardsmini/k_c.jpg", "A_ZL": "https://hra-lora.cz/assets/cardsmini/a_c.jpg",
+        "BACK": "https://hra-lora.cz/assets/cardsmini/back.jpg" 
+    };
+
+    const cardKeys = Object.keys(IMAGE_URLS).filter(k => k !== "BACK");
+    const getVal = (k) => {
+        let v = k.split('_')[0];
+        if(v === 't') return 10;
+        if(v === 'j') return 11;
+        if(v === 'q') return 12;
+        if(v === 'k') return 13;
+        if(v === 'a') return 14;
+        return parseInt(v);
+    };
+
     window.login = () => {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('pass').value;
-        signInWithEmailAndPassword(auth, e, p).catch(err => alert("Chyba: " + err.message));
+        signInWithEmailAndPassword(auth, email.value, pass.value).catch(e => alert(e.message));
     };
-
     window.logout = () => signOut(auth);
 
-    onAuthStateChanged(auth, (user) => {
-        currentUser = user;
-        if (user) {
-            onValue(ref(db, `tips/${user.uid}`), (snap) => {
-                userData = snap.val() || { balance: 0, coins: 0, name: "Hráč" };
-                document.getElementById('txtTC').innerText = userData.balance || 0;
-                document.getElementById('txtCoins').innerText = userData.coins || 0;
-                
-                document.getElementById('authSection').style.display = 'none';
-                document.getElementById('mainMenu').style.display = 'block';
+    onAuthStateChanged(auth, u => {
+        currentUser = u;
+        if (u) {
+            onValue(ref(db, `tips/${u.uid}`), snap => {
+                userData = snap.val() || { balance: 0, coins: 0 };
+                txtTC.innerText = userData.balance || 0;
+                txtCoins.innerText = userData.coins || 0;
+                authSection.classList.add('hidden');
+                mainWrapper.classList.remove('hidden');
             });
         } else {
-            document.getElementById('authSection').style.display = 'block';
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('gameArea').style.display = 'none';
+            authSection.classList.remove('hidden');
+            mainWrapper.classList.add('hidden');
+            gameArea.classList.add('hidden');
         }
     });
 
-    // --- SMĚNÁRNA (DLE RULES) ---
     window.exchange = (type) => {
-        let newBalance, newCoins;
-        
-        if (type === 'toCoins') {
-            if (userData.balance < 100) return alert("Nedostatek TC!");
-            newBalance = userData.balance - 100;
-            newCoins = (userData.coins || 0) + 2000;
+        const amt = parseInt(exAmount.value);
+        if(!amt || amt <= 0) return alert("Zadej částku!");
+        let newB, newC;
+        if(type === 'toCoins') {
+            if(userData.balance < amt) return alert("Málo TC!");
+            newB = userData.balance - amt;
+            newC = (userData.coins || 0) + (amt * 20);
         } else {
-            if (userData.coins < 2000) return alert("Nedostatek Coinů!");
-            newBalance = userData.balance + 100;
-            newCoins = userData.coins - 2000;
+            if(userData.coins < (amt * 20)) return alert("Málo Coinů!");
+            newB = userData.balance + amt;
+            newC = userData.coins - (amt * 20);
         }
-
-        update(ref(db, `tips/${currentUser.uid}`), {
-            balance: newBalance,
-            coins: newCoins
-        }).then(() => alert("Směna úspěšná!"));
+        update(ref(db, `tips/${currentUser.uid}`), { balance: newB, coins: newC });
     };
 
-    // --- LOGIKA HRY HCW ---
     window.showGame = () => {
-        document.getElementById('mainMenu').style.display = 'none';
-        document.getElementById('gameArea').style.display = 'block';
+        mainMenu.classList.add('hidden');
+        gameArea.classList.remove('hidden');
         window.nextRound();
     };
 
     window.closeGame = () => {
-        document.getElementById('gameArea').style.display = 'none';
-        document.getElementById('mainMenu').style.display = 'block';
+        gameArea.classList.add('hidden');
+        mainMenu.classList.remove('hidden');
     };
 
     window.nextRound = () => {
         gameState.active = true;
         gameState.pot = 0;
-        document.getElementById('potAmount').innerText = "0";
-        document.getElementById('btnNext').style.display = 'none';
-        document.getElementById('btnBet').style.display = 'block';
-        document.getElementById('log').innerHTML = "Rozdávám karty...";
+        potAmount.innerText = "0";
+        btnNext.classList.add('hidden');
+        gameControls.classList.remove('hidden');
+        log.innerHTML = "Nové kolo rozdané.";
 
-        // Reset hráčů
         gameState.players = [
-            { id: 0, name: "Ty", card: Math.floor(Math.random()*13), folded: false, isBot: false },
-            { id: 1, name: botNames[0], card: Math.floor(Math.random()*13), folded: false, isBot: true },
-            { id: 2, name: botNames[1], card: Math.floor(Math.random()*13), folded: false, isBot: true }
+            { name: "Ty", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: false },
+            { name: "Pukator", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: true },
+            { name: "Hokejka88", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: true }
         ];
-
-        renderPlayers(false);
+        render(false);
     };
 
-    function renderPlayers(reveal) {
-        const area = document.getElementById('playerArea');
-        area.innerHTML = "";
-
+    function render(reveal) {
+        table.innerHTML = "";
         gameState.players.forEach(p => {
-            const cardText = (reveal || !p.isBot) ? cardValues[p.card] : "?";
-            area.innerHTML += `
-                <div class="card-slot ${p.id === 0 ? 'active' : ''} ${p.folded ? 'folded' : ''}">
+            let img = (reveal || !p.isBot) ? IMAGE_URLS[p.card] : IMAGE_URLS["BACK"];
+            table.innerHTML += `
+                <div class="player-slot">
                     <div class="label">${p.name}</div>
-                    <div class="card-val">${cardText}</div>
-                    <div class="label">${p.folded ? 'PAS' : (reveal ? 'Konec' : '')}</div>
+                    <img src="${img}" class="card-img">
                 </div>
             `;
         });
     }
 
     window.gameAction = (type) => {
-        if (!gameState.active) return;
+        let bet = 0;
+        if(type === 'allin') bet = userData.coins;
+        else bet = parseInt(betInput.value);
 
-        if (type === 'bet') {
-            if (userData.coins < 100) return alert("Nemáš dost coinů!");
-            
-            // Okamžitý odečet sázky z DB
-            update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins - 100 });
-            gameState.pot += 100;
-            addLog("Vsadil jsi 100 C.");
-        } else {
-            gameState.players[0].folded = true;
-            addLog("Položil jsi karty.");
-        }
+        if(!bet || bet <= 0 || bet > userData.coins) return alert("Neplatná sázka!");
 
-        // Tahy botů
-        gameState.players.forEach(p => {
-            if (p.isBot && !p.folded) {
-                if (p.card < 3 && Math.random() > 0.5) {
-                    p.folded = true;
-                    addLog(`${p.name} pasuje.`);
-                } else {
-                    gameState.pot += 100;
-                    addLog(`${p.name} dorovnal sázku.`);
-                }
-            }
-        });
-
-        document.getElementById('potAmount').innerText = gameState.pot;
-        evaluateGame();
+        gameState.lastBet = bet;
+        gameState.pot = bet * 3; // Ty + 2 boti
+        update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins - bet });
+        
+        potAmount.innerText = gameState.pot;
+        evaluate();
     };
 
-    function evaluateGame() {
+    function evaluate() {
         gameState.active = false;
-        renderPlayers(true);
+        render(true);
+        let myVal = getVal(gameState.players[0].card);
+        let maxBot = Math.max(getVal(gameState.players[1].card), getVal(gameState.players[2].card));
 
-        let winner = null;
-        let maxCard = -1;
-
-        gameState.players.forEach(p => {
-            if (!p.folded && p.card > maxCard) {
-                maxCard = p.card;
-                winner = p;
-            }
-        });
-
-        if (winner && winner.id === 0) {
-            addLog(`VYHRÁL JSI ${gameState.pot} COINŮ!`);
-            update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins + gameState.pot });
-        } else if (winner) {
-            addLog(`Vítěz: ${winner.name} (${cardValues[winner.card]})`);
+        if(myVal > maxBot) {
+            let win = gameState.pot;
+            addLog(`VYHRÁL JSI ${win} C!`);
+            update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins + win });
+        } else if(myVal === maxBot) {
+            addLog("REMÍZA! Sázka vrácena.");
+            update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins + gameState.lastBet });
         } else {
-            addLog("Všichni pasovali, bank propadá.");
+            addLog("Prohrál jsi.");
         }
 
-        document.getElementById('btnNext').style.display = 'block';
-        document.getElementById('btnBet').style.display = 'none';
+        btnNext.classList.remove('hidden');
+        betInput.value = "";
     }
 
-    function addLog(msg) {
-        const log = document.getElementById('log');
-        log.innerHTML = `<div>> ${msg}</div>` + log.innerHTML;
-    }
-
+    function addLog(m) { log.innerHTML = `<div>> ${m}</div>` + log.innerHTML; }
 </script>
-
 </body>
 </html>
