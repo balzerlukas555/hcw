@@ -291,9 +291,11 @@
         
         let bet = 0;
         if(type === 'fold') {
+            if(userData.coins < 20) return alert("Nemáš ani 20 coinů na Pas!");
             gameState.players[0].folded = true;
-            addLog("Položil jsi karty.");
-            evaluate();
+            addLog("Položil jsi karty (-20 C).");
+            update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins - 20 })
+                .then(() => evaluate());
             return;
         }
 
