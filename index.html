@@ -24,7 +24,6 @@
 
         h1 { color: #3b82f6; text-transform: uppercase; letter-spacing: 2px; margin: 15px 0; }
 
-        /* --- HOSPODSKÝ STYL BOXŮ --- */
         .auth-box, .menu-box, .game-area { 
             background: #161e2d; 
             padding: 20px; 
@@ -75,17 +74,19 @@
         .btn-danger { background: #991b1b; }
         .btn-alt { background: #334155; }
 
-        /* --- KARTY --- */
+        /* OPRAVA KARET - NEKROPOVAT */
         .card-img {
             width: 90px;
-            height: 130px;
-            border-radius: 6px;
+            height: auto;
+            border-radius: 4px;
             border: 1px solid #4a5568;
             background: #2d3748;
-            object-fit: cover;
+            display: block;
+            margin: 0 auto;
         }
 
-        .player-slot { margin: 10px; display: inline-block; vertical-align: top; }
+        .player-slot { margin: 5px; display: inline-block; vertical-align: top; width: 100px; }
+        
         .pot-box { 
             font-size: 22px; 
             color: #fbbf24; 
@@ -190,8 +191,9 @@
     };
 
     const cardKeys = Object.keys(IMAGE_URLS).filter(k => k !== "BACK");
+    
     const getVal = (k) => {
-        let v = k.split('_')[0];
+        let v = k.split('_')[0].toLowerCase();
         if(v === 't') return 10;
         if(v === 'j') return 11;
         if(v === 'q') return 12;
@@ -201,8 +203,11 @@
     };
 
     window.login = () => {
-        signInWithEmailAndPassword(auth, email.value, pass.value).catch(e => alert(e.message));
+        const emailVal = document.getElementById('email').value;
+        const passVal = document.getElementById('pass').value;
+        signInWithEmailAndPassword(auth, emailVal, passVal).catch(e => alert(e.message));
     };
+    
     window.logout = () => signOut(auth);
 
     onAuthStateChanged(auth, u => {
@@ -210,21 +215,22 @@
         if (u) {
             onValue(ref(db, `tips/${u.uid}`), snap => {
                 userData = snap.val() || { balance: 0, coins: 0 };
-                txtTC.innerText = userData.balance || 0;
-                txtCoins.innerText = userData.coins || 0;
-                authSection.classList.add('hidden');
-                mainWrapper.classList.remove('hidden');
+                document.getElementById('txtTC').innerText = userData.balance || 0;
+                document.getElementById('txtCoins').innerText = userData.coins || 0;
+                document.getElementById('authSection').classList.add('hidden');
+                document.getElementById('mainWrapper').classList.remove('hidden');
             });
         } else {
-            authSection.classList.remove('hidden');
-            mainWrapper.classList.add('hidden');
-            gameArea.classList.add('hidden');
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('mainWrapper').classList.add('hidden');
+            document.getElementById('gameArea').classList.add('hidden');
         }
     });
 
     window.exchange = (type) => {
-        const amt = parseInt(exAmount.value);
-        if(!amt || amt <= 0) return alert("Zadej částku!");
+        const amt = parseInt(document.getElementById('exAmount').value);
+        if(!amt || amt <= 0) return alert("Zadej platnou hodnotu pro směnu!");
+        
         let newB, newC;
         if(type === 'toCoins') {
             if(userData.balance < amt) return alert("Málo TC!");
@@ -239,82 +245,110 @@
     };
 
     window.showGame = () => {
-        mainMenu.classList.add('hidden');
-        gameArea.classList.remove('hidden');
+        document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('gameArea').classList.remove('hidden');
         window.nextRound();
     };
 
     window.closeGame = () => {
-        gameArea.classList.add('hidden');
-        mainMenu.classList.remove('hidden');
+        document.getElementById('gameArea').classList.add('hidden');
+        document.getElementById('mainMenu').classList.remove('hidden');
     };
 
     window.nextRound = () => {
         gameState.active = true;
         gameState.pot = 0;
-        potAmount.innerText = "0";
-        btnNext.classList.add('hidden');
-        gameControls.classList.remove('hidden');
-        log.innerHTML = "Nové kolo rozdané.";
+        document.getElementById('potAmount').innerText = "0";
+        document.getElementById('btnNext').classList.add('hidden');
+        document.getElementById('gameControls').classList.remove('hidden');
+        document.getElementById('log').innerHTML = "Nové kolo rozdané.";
 
         gameState.players = [
-            { name: "Ty", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: false },
-            { name: "Pukator", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: true },
-            { name: "Hokejka88", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: true }
+            { name: "TY", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: false, folded: false },
+            { name: "PUKATOR", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: true, folded: false },
+            { name: "HOKEJKA88", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: true, folded: false }
         ];
         render(false);
     };
 
     function render(reveal) {
+        const table = document.getElementById('table');
         table.innerHTML = "";
         gameState.players.forEach(p => {
             let img = (reveal || !p.isBot) ? IMAGE_URLS[p.card] : IMAGE_URLS["BACK"];
             table.innerHTML += `
                 <div class="player-slot">
-                    <div class="label">${p.name}</div>
+                    <div class="label" style="margin-bottom:5px">${p.name}</div>
                     <img src="${img}" class="card-img">
+                    <div class="label" style="margin-top:5px; color: #ef4444;">${p.folded ? 'PAS' : ''}</div>
                 </div>
             `;
         });
     }
 
     window.gameAction = (type) => {
+        if(!gameState.active) return;
+        
         let bet = 0;
-        if(type === 'allin') bet = userData.coins;
-        else bet = parseInt(betInput.value);
+        if(type === 'fold') {
+            gameState.players[0].folded = true;
+            addLog("Položil jsi karty.");
+            evaluate();
+            return;
+        }
 
-        if(!bet || bet <= 0 || bet > userData.coins) return alert("Neplatná sázka!");
+        if(type === 'allin') {
+            bet = userData.coins;
+        } else {
+            bet = parseInt(document.getElementById('betInput').value);
+        }
+
+        if(isNaN(bet) || bet <= 0 || bet > userData.coins) {
+            return alert("Neplatná hodnota sázky!");
+        }
 
         gameState.lastBet = bet;
-        gameState.pot = bet * 3; // Ty + 2 boti
-        update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins - bet });
+        gameState.pot = bet * 3; 
         
-        potAmount.innerText = gameState.pot;
-        evaluate();
+        update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins - bet })
+            .then(() => {
+                document.getElementById('potAmount').innerText = gameState.pot;
+                evaluate();
+            });
     };
 
     function evaluate() {
         gameState.active = false;
         render(true);
-        let myVal = getVal(gameState.players[0].card);
-        let maxBot = Math.max(getVal(gameState.players[1].card), getVal(gameState.players[2].card));
-
-        if(myVal > maxBot) {
-            let win = gameState.pot;
-            addLog(`VYHRÁL JSI ${win} C!`);
-            update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins + win });
-        } else if(myVal === maxBot) {
-            addLog("REMÍZA! Sázka vrácena.");
-            update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins + gameState.lastBet });
+        
+        if(gameState.players[0].folded) {
+            addLog("Prohrál jsi (vzdal ses).");
         } else {
-            addLog("Prohrál jsi.");
+            let myVal = getVal(gameState.players[0].card);
+            let b1Val = getVal(gameState.players[1].card);
+            let b2Val = getVal(gameState.players[2].card);
+            let maxBot = Math.max(b1Val, b2Val);
+
+            if(myVal > maxBot) {
+                let win = gameState.pot;
+                addLog(`VYHRÁL JSI ${win} C!`);
+                update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins + win });
+            } else if(myVal === maxBot) {
+                addLog("REMÍZA! Sázka vrácena.");
+                update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins + gameState.lastBet });
+            } else {
+                addLog("Prohrál jsi.");
+            }
         }
 
-        btnNext.classList.remove('hidden');
-        betInput.value = "";
+        document.getElementById('btnNext').classList.remove('hidden');
+        document.getElementById('betInput').value = "";
     }
 
-    function addLog(m) { log.innerHTML = `<div>> ${m}</div>` + log.innerHTML; }
+    function addLog(m) { 
+        const logBox = document.getElementById('log');
+        logBox.innerHTML = `<div>> ${m}</div>` + logBox.innerHTML; 
+    }
 </script>
 </body>
 </html>
