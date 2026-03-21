@@ -65,17 +65,19 @@
         .btn-danger { background: #991b1b; }
         .btn-alt { background: #334155; }
 
-        /* --- KARTY --- */
+        /* OPRAVA KARET - CELÉ ZOBRAZENÍ */
         .card-img {
-            width: 85px;
-            height: 120px;
-            border-radius: 6px;
+            width: 90px;
+            height: auto;
+            border-radius: 4px;
             border: 1px solid #4a5568;
             background: #2d3748;
-            object-fit: cover;
+            display: block;
+            margin: 0 auto;
         }
 
-        .player-slot { margin: 10px; display: inline-block; vertical-align: top; width: 100px; }
+        .player-slot { margin: 5px; display: inline-block; vertical-align: top; width: 100px; }
+        
         .pot-box { 
             font-size: 22px; 
             color: #fbbf24; 
@@ -151,8 +153,9 @@
     };
 
     const cardKeys = Object.keys(IMAGE_URLS).filter(k => k !== "BACK");
+    
     const getVal = (k) => {
-        let v = k.split('_')[0];
+        let v = k.split('_')[0].toLowerCase();
         if(v === 't') return 10;
         if(v === 'j') return 11;
         if(v === 'q') return 12;
@@ -162,30 +165,30 @@
     };
 
     let gameState = { players: [], pot: 0, active: false, lastBet: 0 };
-    const botNames = ["Pukator", "Hokejka88", "Lapač"];
+    const botNames = ["PUKATOR", "HOKEJKA88", "LAPAČ"];
 
     function initGame() {
-        const nick = nickInput.value || "Host";
-        const budget = parseInt(budgetInput.value) || 2000;
-        const bots = parseInt(botCount.value);
+        const nick = document.getElementById('nickInput').value || "Host";
+        const budget = parseInt(document.getElementById('budgetInput').value) || 2000;
+        const bots = parseInt(document.getElementById('botCount').value);
 
-        gameState.players = [{ name: nick, budget: budget, card: '', isBot: false, folded: false }];
+        gameState.players = [{ name: nick.toUpperCase(), budget: budget, card: '', isBot: false, folded: false }];
         for(let i=0; i<bots; i++) {
             gameState.players.push({ name: botNames[i], budget: budget, card: '', isBot: true, folded: false });
         }
 
-        setupScreen.classList.add('hidden');
-        gameScreen.classList.remove('hidden');
+        document.getElementById('setupScreen').classList.add('hidden');
+        document.getElementById('gameScreen').classList.remove('hidden');
         nextRound();
     }
 
     function nextRound() {
         gameState.active = true;
         gameState.pot = 0;
-        potAmount.innerText = "0";
-        btnNext.classList.add('hidden');
-        log.innerHTML = "Kolo začalo.";
-        userBudget.innerText = gameState.players[0].budget;
+        document.getElementById('potAmount').innerText = "0";
+        document.getElementById('btnNext').classList.add('hidden');
+        document.getElementById('log').innerHTML = "Kolo začalo.";
+        document.getElementById('userBudget').innerText = gameState.players[0].budget;
 
         gameState.players.forEach(p => {
             p.card = cardKeys[Math.floor(Math.random()*cardKeys.length)];
@@ -201,9 +204,10 @@
         gameState.players.forEach(p => {
             let img = (reveal || !p.isBot) ? IMAGE_URLS[p.card] : IMAGE_URLS["BACK"];
             area.innerHTML += `
-                <div class="player-slot ${p.folded ? 'hidden' : ''}">
+                <div class="player-slot">
                     <div class="label">${p.name}</div>
                     <img src="${img}" class="card-img">
+                    <div class="label" style="color: #ef4444; margin-top:5px;">${p.folded ? 'PAS' : ''}</div>
                 </div>
             `;
         });
@@ -214,27 +218,36 @@
         let me = gameState.players[0];
         let bet = 0;
 
-        if(type === 'allin') bet = me.budget;
-        else if(type === 'fold') { me.folded = true; evaluate(); return; }
-        else bet = parseInt(betInput.value);
+        if(type === 'fold') { 
+            me.folded = true; 
+            evaluate(); 
+            return; 
+        }
 
-        if(!bet || bet <= 0 || bet > me.budget) return alert("Neplatná sázka!");
+        if(type === 'allin') {
+            bet = me.budget;
+        } else {
+            bet = parseInt(document.getElementById('betInput').value);
+        }
+
+        if(isNaN(bet) || bet <= 0 || bet > me.budget) {
+            return alert("Neplatná hodnota sázky!");
+        }
 
         gameState.lastBet = bet;
         me.budget -= bet;
         
-        // Boti dorovnají tvou sázku pro jednoduchost simulace banku
-        let activePlayers = 1;
+        let activeBots = 0;
         gameState.players.forEach(p => {
             if(p.isBot) {
-                p.budget -= bet;
-                activePlayers++;
+                p.budget -= bet; // Simulace, že boti vždy dorovnají
+                activeBots++;
             }
         });
 
-        gameState.pot = bet * activePlayers;
-        potAmount.innerText = gameState.pot;
-        userBudget.innerText = me.budget;
+        gameState.pot = bet * (activeBots + 1);
+        document.getElementById('potAmount').innerText = gameState.pot;
+        document.getElementById('userBudget').innerText = me.budget;
         evaluate();
     }
 
@@ -261,18 +274,21 @@
             }
         }
 
-        userBudget.innerText = me.budget;
-        btnNext.classList.remove('hidden');
-        betInput.value = "";
+        document.getElementById('userBudget').innerText = me.budget;
+        document.getElementById('btnNext').classList.remove('hidden');
+        document.getElementById('betInput').value = "";
 
         if(me.budget <= 0) {
             addLog("BANKROT! Hra končí.");
-            btnNext.onclick = () => location.reload();
-            btnNext.innerText = "RESTART";
+            document.getElementById('btnNext').onclick = () => location.reload();
+            document.getElementById('btnNext').innerText = "RESTART";
         }
     }
 
-    function addLog(m) { log.innerHTML = `<div>> ${m}</div>` + log.innerHTML; }
+    function addLog(m) { 
+        const logBox = document.getElementById('log');
+        logBox.innerHTML = `<div>> ${m}</div>` + logBox.innerHTML; 
+    }
 </script>
 </body>
 </html>
