@@ -262,13 +262,13 @@
         document.getElementById('gameControls').classList.remove('hidden');
         document.getElementById('log').innerHTML = "Nové kolo rozdané.";
 
-        // OPRAVA: Unikátní karty pro každé kolo
         const shuffled = [...cardKeys].sort(() => Math.random() - 0.5);
 
         gameState.players = [
             { name: "TY", card: shuffled[0], isBot: false, folded: false },
             { name: "PEPA", card: shuffled[1], isBot: true, folded: false },
-            { name: "MARTIN", card: shuffled[2], isBot: true, folded: false }
+            { name: "MARTIN", card: shuffled[2], isBot: true, folded: false },
+            { name: "LAPAČ", card: shuffled[3], isBot: true, folded: false }
         ];
         render(false);
     };
@@ -293,10 +293,10 @@
         
         let bet = 0;
         if(type === 'fold') {
-            if(userData.coins < 20) return alert("Nemáš ani 20 coinů na Pas!");
+            if(userData.coins < 10) return alert("Nemáš ani 10 coinů na Pas!");
             gameState.players[0].folded = true;
-            addLog("Položil jsi karty (-20 C).");
-            update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins - 20 })
+            addLog("Položil jsi karty (-10 C).");
+            update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins - 10 })
                 .then(() => evaluate());
             return;
         }
@@ -312,7 +312,7 @@
         }
 
         gameState.lastBet = bet;
-        gameState.pot = bet * 3; 
+        gameState.pot = bet * 4; 
         
         update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins - bet })
             .then(() => {
@@ -331,7 +331,8 @@
             let myVal = getVal(gameState.players[0].card);
             let b1Val = getVal(gameState.players[1].card);
             let b2Val = getVal(gameState.players[2].card);
-            let maxBot = Math.max(b1Val, b2Val);
+            let b3Val = getVal(gameState.players[3].card);
+            let maxBot = Math.max(b1Val, b2Val, b3Val);
 
             if(myVal > maxBot) {
                 let win = gameState.pot;
