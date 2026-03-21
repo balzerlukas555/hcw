@@ -74,7 +74,6 @@
         .btn-danger { background: #991b1b; }
         .btn-alt { background: #334155; }
 
-        /* OPRAVA KARET - NEKROPOVAT */
         .card-img {
             width: 90px;
             height: auto;
@@ -263,10 +262,13 @@
         document.getElementById('gameControls').classList.remove('hidden');
         document.getElementById('log').innerHTML = "Nové kolo rozdané.";
 
+        // OPRAVA: Unikátní karty pro každé kolo
+        const shuffled = [...cardKeys].sort(() => Math.random() - 0.5);
+
         gameState.players = [
-            { name: "TY", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: false, folded: false },
-            { name: "PUKATOR", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: true, folded: false },
-            { name: "HOKEJKA88", card: cardKeys[Math.floor(Math.random()*cardKeys.length)], isBot: true, folded: false }
+            { name: "TY", card: shuffled[0], isBot: false, folded: false },
+            { name: "PEPA", card: shuffled[1], isBot: true, folded: false },
+            { name: "MARTIN", card: shuffled[2], isBot: true, folded: false }
         ];
         render(false);
     };
