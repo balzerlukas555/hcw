@@ -181,7 +181,7 @@
 
     const IMAGE_URLS = {
         "7_K": "https://hra-lora.cz/assets/cardsmini/7_d.jpg", "8_K": "https://hra-lora.cz/assets/cardsmini/8_d.jpg", "9_K": "https://hra-lora.cz/assets/cardsmini/9_d.jpg", "10_K": "https://hra-lora.cz/assets/cardsmini/t_d.jpg", "J_K": "https://hra-lora.cz/assets/cardsmini/j_d.jpg", "Q_K": "https://hra-lora.cz/assets/cardsmini/q_d.jpg", "K_K": "https://hra-lora.cz/assets/cardsmini/k_d.jpg", "A_K": "https://hra-lora.cz/assets/cardsmini/a_d.jpg",
-        "7_Z": "https://hra-lora.cz/assets/cardsmini/7_s.jpg", "8_Z": "https://hra-lora.cz/assets/cardsmini/8_s.jpg", "9_Z": "https://hra-lora.cz/assets/cardsmini/9_s.jpg", "10_Z": "https://hra-lora.cz/assets/cardsmini/t_s.jpg", "J_Z": "https://hra-lora.cz/assets/cardsmini/j_s.jpg", "Q_Z": "https://hra-lora.cz/assets/cardsmini/q_s.jpg", "K_Z": "https://hra-lora.cz/assets/cardsmini/k_s.jpg", "A_Z": "https://hra-lora.cz/assets/cardsmini/a_s.jpg",
+        "7_Z": "https://hra-lora.cz/assets/cardsmini/7_s.jpg", "8_Z": "https://hra-lora.cz/assets/cardsmini/8_s.jpg", "9_Z": "https://hra-lora.cz/assets/cardsmini/9_z.jpg", "10_Z": "https://hra-lora.cz/assets/cardsmini/t_s.jpg", "J_Z": "https://hra-lora.cz/assets/cardsmini/j_s.jpg", "Q_Z": "https://hra-lora.cz/assets/cardsmini/q_s.jpg", "K_Z": "https://hra-lora.cz/assets/cardsmini/k_s.jpg", "A_Z": "https://hra-lora.cz/assets/cardsmini/a_s.jpg",
         "7_C": "https://hra-lora.cz/assets/cardsmini/7_h.jpg", "8_C": "https://hra-lora.cz/assets/cardsmini/8_h.jpg", "9_C": "https://hra-lora.cz/assets/cardsmini/9_h.jpg", "10_C": "https://hra-lora.cz/assets/cardsmini/t_h.jpg", "J_C": "https://hra-lora.cz/assets/cardsmini/j_h.jpg", "Q_C": "https://hra-lora.cz/assets/cardsmini/q_h.jpg", "K_C": "https://hra-lora.cz/assets/cardsmini/k_h.jpg", "A_C": "https://hra-lora.cz/assets/cardsmini/a_h.jpg",
         "7_ZL": "https://hra-lora.cz/assets/cardsmini/7_c.jpg", "8_ZL": "https://hra-lora.cz/assets/cardsmini/8_c.jpg", "9_ZL": "https://hra-lora.cz/assets/cardsmini/9_c.jpg", "10_ZL": "https://hra-lora.cz/assets/cardsmini/t_c.jpg", "J_ZL": "https://hra-lora.cz/assets/cardsmini/j_c.jpg", "Q_ZL": "https://hra-lora.cz/assets/cardsmini/q_c.jpg", "K_ZL": "https://hra-lora.cz/assets/cardsmini/k_c.jpg", "A_ZL": "https://hra-lora.cz/assets/cardsmini/a_c.jpg",
         "BACK": "https://hra-lora.cz/assets/cardsmini/back.jpg" 
@@ -252,7 +252,6 @@
         document.getElementById('mainMenu').classList.remove('hidden');
     };
 
-    // Podstivé míchání karet (Fisher-Yates Shuffle)
     function shuffleCards(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -317,7 +316,7 @@
         }
 
         gameState.lastBet = bet;
-        gameState.pot = bet * 4; 
+        gameState.pot = bet; // All-In je tvůj vklad
         
         update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins - bet })
             .then(() => {
@@ -341,8 +340,7 @@
             let b3Val = getVal(gameState.players[3].card);
             let maxBot = Math.max(b1Val, b2Val, b3Val);
 
-            // Výpočet násobitele podle karty
-            let multiplier = 5; // Výchozí pro 9, 8, 7
+            let multiplier = 5; 
             if (myRawVal === 'a') multiplier = 1.2;
             else if (myRawVal === 'k') multiplier = 1.5;
             else if (myRawVal === 'q') multiplier = 2;
@@ -350,8 +348,8 @@
             else if (myRawVal === 't') multiplier = 3;
 
             if(myVal > maxBot) {
-                let win = Math.floor(gameState.pot * multiplier);
-                addLog(`VYHRÁL JSI ALL-IN! Bonus ${multiplier}x: ${win} C!`);
+                let win = Math.floor(gameState.lastBet * multiplier);
+                addLog(`VYHRÁL JSI! Karta: ${myRawVal.toUpperCase()}, Násobek: ${multiplier}x, Výhra: ${win} C!`);
                 update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins + win });
             } else if(myVal === maxBot) {
                 addLog("REMÍZA! Sázka vrácena.");
