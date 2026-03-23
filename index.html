@@ -333,15 +333,25 @@
         if(gameState.players[0].folded) {
             addLog("Prohrál jsi (vzdal ses).");
         } else {
-            let myVal = getVal(gameState.players[0].card);
+            const myCard = gameState.players[0].card;
+            const myRawVal = myCard.split('_')[0].toLowerCase();
+            let myVal = getVal(myCard);
             let b1Val = getVal(gameState.players[1].card);
             let b2Val = getVal(gameState.players[2].card);
             let b3Val = getVal(gameState.players[3].card);
             let maxBot = Math.max(b1Val, b2Val, b3Val);
 
+            // Výpočet násobitele podle karty
+            let multiplier = 5; // Výchozí pro 9, 8, 7
+            if (myRawVal === 'a') multiplier = 1.2;
+            else if (myRawVal === 'k') multiplier = 1.5;
+            else if (myRawVal === 'q') multiplier = 2;
+            else if (myRawVal === 'j') multiplier = 2.5;
+            else if (myRawVal === 't') multiplier = 3;
+
             if(myVal > maxBot) {
-                let win = gameState.pot;
-                addLog(`VYHRÁL JSI ALL-IN ${win} C!`);
+                let win = Math.floor(gameState.pot * multiplier);
+                addLog(`VYHRÁL JSI ALL-IN! Bonus ${multiplier}x: ${win} C!`);
                 update(ref(db, `tips/${currentUser.uid}`), { coins: userData.coins + win });
             } else if(myVal === maxBot) {
                 addLog("REMÍZA! Sázka vrácena.");
